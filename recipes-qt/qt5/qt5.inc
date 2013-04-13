@@ -6,8 +6,6 @@ inherit qmake5_base
 ICU = "icu "
 ICU_powerpc = "pango"
 
-DEPENDS += "qt5-tools-native virtual/libgl freetype jpeg libpng zlib openssl glib-2.0 ${ICU}"
-
 require qt5_arch.inc
 
 QT_MODULE ?= "${BPN}"
@@ -18,7 +16,8 @@ QT_DISTRO_FLAGS_linuxstdbase = "-sm"
 # Some can be used only for certain QT_MODULEs, so define them here, 
 # but add them to QT_CONFIG_FLAGS e.g. in qtbase.inc
 QT_SQL_DRIVER_FLAGS ?= "-no-sql-ibase -no-sql-mysql -no-sql-psql -no-sql-odbc -plugin-sql-sqlite"
-QT_GLFLAGS ?= ""
+QT_GLFLAGS ?= "${@base_contains('DISTRO_FEATURES', 'virtual/libgl', '', '-opengl es2', d)}"
+
 QT_XML ?= "-xmlpatterns"
 QT_WEBKIT ?= "-webkit"
 QT_PHONON ?= "-phonon"
@@ -30,9 +29,10 @@ QT_NIS ?= "-no-nis"
 QT_CUPS ?= "-no-cups"
 QT_STL ?= "-stl"
 QT_SYSTEM_LIBS ?= "-system-libjpeg -system-libpng -system-zlib"
-QT_TESTS ?= "-nomake tests"
-QT_EXAMPLES ?= "-nomake examples"
-QT_DEMOS ?= "-nomake demos"
+
+#QT_TESTS ?= "-nomake tests"
+#QT_EXAMPLES ?= "-nomake examples"
+#QT_DEMOS ?= "-nomake demos"
 
 QT_CONFIG_FLAGS += " \
   -release \
@@ -43,6 +43,7 @@ QT_CONFIG_FLAGS += " \
   -no-pch \
   -no-rpath \
   -pkg-config \
+  -no-xcb \
   ${QT_SYSTEM_LIBS} \
   ${QT_NIS} \
   ${QT_CUPS} \
@@ -53,6 +54,7 @@ QT_CONFIG_FLAGS += " \
   ${QT_TESTS} \
   ${QT_EXAMPLES} \
   ${QT_DEMOS} \
+  -no-kms \
 "
 
 EXTRA_ENV = 'QMAKE="${STAGING_BINDIR_NATIVE}/qmake -d -after \
@@ -86,6 +88,7 @@ do_install() {
 }
 
 PACKAGES =. "${PN}-tools ${PN}-plugins ${PN}-plugins-dbg "
+
 FILES_${PN}-tools = "${bindir}/*"
 FILES_${PN}-plugins = "${libdir}/${QT_DIR_NAME}/plugins/*/*${SOLIBSDEV}"
 FILES_${PN}-plugins-dbg = "${libdir}/${QT_DIR_NAME}/plugins/*/.debug/*"
@@ -96,3 +99,4 @@ FILES_${PN}-dev += " \
         ${includedir}/qt5/* \
         ${datadir}/qt5/* \
 "
+INSANE_SKIP_${PN}-tools = "debug-files staticdev"

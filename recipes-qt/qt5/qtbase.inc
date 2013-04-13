@@ -6,9 +6,12 @@ SRC_URI += " \
   file://0003-Allow-building-a-separate-qmake-for-the-target.patch \
   file://qmake.conf.sh \
   file://qplatformdefs.h \
+  file://0004-Eglfs-share-single-surface.patch \
 "
 
-DEPENDS += "qt5-tools-native virtual/libgl freetype jpeg libpng zlib openssl glib-2.0 ${ICU}"
+DEPENDS += "qt5-tools-native freetype jpeg libpng zlib openssl glib-2.0 ${ICU}"
+DEPENDS += "${@base_contains('DISTRO_FEATURES', 'virtual/libgl', 'virtual/libgl', 'virtual/egl virtual/libgles2', d)}"
+
 
 # to provide xcb/xcb_icccm.h, xcb/xcb_image.h, xcb/xcb_keysyms.h and dbus/dbus.h
 # DEPENDS += "xcb-util-wm xcb-util-image xcb-util-keysyms dbus"
